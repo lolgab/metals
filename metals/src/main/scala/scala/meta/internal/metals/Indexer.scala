@@ -188,15 +188,21 @@ case class Indexer(indexProviders: IndexProviders)(implicit rc: ReportContext) {
                       val adjustLspData =
                         AdjustedLspData.create(fromGenerated)
                       val bottomWrapper = "\n}"
-                      val contentWithoutMagicImports = content.linesIterator.map {
-                        case s"import $$ivy.$_" => "import _root_._"
-                        case s"import $$packages.$_" => "import _root_._"
-                        case s"import $$file.$_" => "import _root_._"
-                        case s"import $$meta.$_" => "import _root_._"
-                        case s"import $$repo.$_" => "import _root_._"
-                        case other => other
-                      }.mkString("", "\n", "\n")
-                      val newGeneratedContent = topWrapperLines.mkString("", "\n", "\n") + contentWithoutMagicImports + bottomWrapper
+                      val contentWithoutMagicImports = content.linesIterator
+                        .map {
+                          case s"import $$ivy.$_" => "import _root_._"
+                          case s"import $$packages.$_" => "import _root_._"
+                          case s"import $$file.$_" => "import _root_._"
+                          case s"import $$meta.$_" => "import _root_._"
+                          case s"import $$repo.$_" => "import _root_._"
+                          case other => other
+                        }
+                        .mkString("", "\n", "\n")
+                      val newGeneratedContent = topWrapperLines.mkString(
+                        "",
+                        "\n",
+                        "\n",
+                      ) + contentWithoutMagicImports + bottomWrapper
                       (
                         Input.VirtualFile(
                           generatedPath.toString,
